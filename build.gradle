@@ -1,0 +1,66 @@
+plugins {
+    id "java-gradle-plugin"
+    id "com.gradle.plugin-publish" version "0.9.7"
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+}
+
+group = "com.github.bsideup"
+
+sourceCompatibility = targetCompatibility = 1.8
+
+pluginBundle {
+    website = vcsUrl = 'https://github.com/bsideup/gradle-maven-sync-plugin'
+    description = 'Sync your Gradle build with the dependencies from pom.xml'
+    tags = ['maven', 'pom', 'pom.xml', 'sync', 'migration']
+
+    plugins {
+        syncPlugin {
+            id = "com.github.bsideup.maven-sync"
+            displayName = 'Gradle Greeting plugin'
+        }
+    }
+}
+
+gradlePlugin {
+    plugins {
+        syncPlugin {
+            id = "com.github.bsideup.maven-sync"
+            implementationClass = "com.github.bsideup.gradle.plugins.maven.sync.MavenDependenciesPlugin"
+        }
+    }
+}
+
+configurations {
+    plugin.description = 'The compile dependencies for the plugin, excluding the local dependencies to avoid problems with Shadow'
+    compile.extendsFrom plugin
+}
+
+shadowJar {
+    configurations = [project.configurations.plugin]
+    classifier = null
+    relocate 'org.jdom2', 'com.github.bsideup.maven-sync.shaded.org.jdom2'
+    relocate 'org.zeroturnaround.exec', 'com.github.bsideup.maven-sync.shaded.org.zeroturnaround.exec'
+
+    exclude 'META-INF/LICENSE'
+    exclude 'META-INF/NOTICE'
+    exclude 'META-INF/maven/**/**'
+
+    dependencies {
+        include(dependency('org.jdom:.*'))
+        include(dependency('org.zeroturnaround:.*'))
+    }
+}
+
+jar.deleteAllActions()
+jar.dependsOn shadowJar
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compileOnly 'org.projectlombok:lombok:1.16.12'
+
+    plugin 'org.zeroturnaround:zt-exec:1.9'
+    plugin 'org.jdom:jdom2:2.0.6'
+}
