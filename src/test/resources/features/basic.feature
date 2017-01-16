@@ -22,10 +22,8 @@ Feature: Maven sync
       apply plugin: 'com.github.bsideup.maven-sync'
     """
     When I run Gradle
-    Then Configuration "compile" of project ":" contains dependencies:
-      | org.slf4j:slf4j-api:1.7.22 |
-    And Configuration "provided" of project ":" contains dependencies:
-      | javax.servlet:javax.servlet-api:3.1.0 |
-    And Configuration "testCompile" of project ":" contains dependencies:
-      | junit:junit:4.12               |
-      | org.assertj:assertj-core:3.6.1 |
+    Then Project ":" contains dependencies:
+      | compile     | org.slf4j:slf4j-api:1.7.22            |
+      | provided    | javax.servlet:javax.servlet-api:3.1.0 |
+      | testCompile | junit:junit:4.12                      |
+      | testCompile | org.assertj:assertj-core:3.6.1        |

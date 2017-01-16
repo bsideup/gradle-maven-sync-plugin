@@ -20,7 +20,10 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class GradleStepdefs {
@@ -83,16 +86,25 @@ public class GradleStepdefs {
     new MavenXpp3Writer().write(Files.newBufferedWriter(pomFile), model);
   }
 
-  @And("^Configuration \"([^\"]*)\" of project \"([^\"]*)\" contains dependencies:$")
-  public void configurationContainsDependencies(String configurationName, String projectName, List<String> dependencies) throws Throwable {
-    assertThat(report.getAsJsonObject(projectName).getAsJsonArray(configurationName))
-        .extracting(JsonElement::getAsJsonObject)
-        .extracting(it -> String.format(
-            "%s:%s:%s",
-            it.get("group").getAsString(),
-            it.get("name").getAsString(),
-            it.get("version").getAsString()
-        ))
-        .containsOnly(dependencies.toArray(new String[] {}));
+  @And("^Project \"([^\"]*)\" contains dependencies:$")
+  public void configurationContainsDependencies(String projectName, List<List<String>> dependencies) throws Throwable {
+    Stream<List<String>> entries = report.getAsJsonObject(projectName)
+        .entrySet()
+        .stream()
+        .flatMap(configurationEntry -> StreamSupport
+            .stream(configurationEntry.getValue().getAsJsonArray().spliterator(), false)
+            .map(JsonObject.class::cast)
+            .map(dependency -> asList(
+                configurationEntry.getKey(),
+                String.format(
+                    "%s:%s:%s",
+                    dependency.get("group").getAsString(),
+                    dependency.get("name").getAsString(),
+                    dependency.get("version").getAsString()
+                )
+            )));
+
+    assertThat(entries)
+        .containsOnly(dependencies.toArray(new List[]{}));
   }
 }
