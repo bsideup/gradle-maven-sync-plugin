@@ -65,7 +65,7 @@ cucumber {
     glueDirs = ['classpath:steps']
     strict = true
 }
-tasks.cucumber.dependsOn(tasks.testClasses)
+tasks.cucumber.dependsOn(tasks.pluginUnderTestMetadata, tasks.testClasses)
 test.dependsOn(tasks.cucumber)
 
 repositories {
