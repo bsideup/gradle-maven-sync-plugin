@@ -28,14 +28,14 @@ Then remove all `dependencies` blocks. Yes. All of them.
 Now add these magical lines to `build.gradle` inside your root folder:
 ```gradle
 plugins {
-    // Add next line if your use `provided` scope
+    // Add next line if you use `provided` scope
     // id 'nebula.provided-base' version '3.0.3'
     id 'com.github.bsideup.maven-sync' version '1.0.5' apply false
 }
 
 allprojects {
     apply plugin: 'java' // should be applied before
-    // Add next line if your use `provided` scope
+    // Add next line if you use `provided` scope
     // apply plugin: 'nebula.provided-base'
     apply plugin: 'com.github.bsideup.maven-sync'
 }
