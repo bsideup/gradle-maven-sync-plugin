@@ -1,7 +1,7 @@
 Feature: Maven sync
 
   Scenario: simple project
-    And POM file with dependencies:
+    Given POM file with dependencies:
       | groupId       | artifactId        | version | scope    |
       | org.slf4j     | slf4j-api         | 1.7.22  |          |
       | javax.servlet | javax.servlet-api | 3.1.0   | provided |
