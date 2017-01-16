@@ -3,6 +3,9 @@ build/
 !gradle-wrapper.jar
 .gradletasknamecache
 
+.classpath
+.project
+.settings/
 
 .idea/
 *.iml
