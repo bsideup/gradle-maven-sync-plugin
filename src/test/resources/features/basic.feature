@@ -1,7 +1,6 @@
 Feature: Maven sync
 
   Scenario: simple project
-    Given a project directory
     And POM file with dependencies:
       | groupId       | artifactId        | version | scope    |
       | org.slf4j     | slf4j-api         | 1.7.22  |          |

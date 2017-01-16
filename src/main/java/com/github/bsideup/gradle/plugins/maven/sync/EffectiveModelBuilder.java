@@ -7,6 +7,7 @@ import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ModuleDependency;
 import org.gradle.api.artifacts.UnknownConfigurationException;
+import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import org.zeroturnaround.exec.InvalidExitValueException;
 import org.zeroturnaround.exec.ProcessExecutor;
@@ -22,6 +23,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toMap;
 
 public enum EffectiveModelBuilder implements Function<Project, Map<MavenCoordinates, Set<Consumer<Project>>>> {
@@ -56,7 +58,11 @@ public enum EffectiveModelBuilder implements Function<Project, Map<MavenCoordina
             MavenCoordinates::create,
             projectElement -> {
               val namespace = projectElement.getNamespace();
-              return projectElement.getChild("dependencies", namespace).getChildren("dependency", namespace)
+              Element dependencies = projectElement.getChild("dependencies", namespace);
+              if (dependencies == null) {
+                return emptySet();
+              }
+              return dependencies.getChildren("dependency", namespace)
                   .stream()
                   .map(dependency -> (Consumer<Project>) subProject -> {
                     val configuration = ((Function<String, String>) scope -> {

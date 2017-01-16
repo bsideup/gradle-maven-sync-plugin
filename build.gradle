@@ -65,8 +65,8 @@ cucumber {
     glueDirs = ['classpath:steps']
     strict = true
 }
-tasks.cucumber.dependsOn(tasks.test)
-check.dependsOn(tasks.cucumber)
+tasks.cucumber.dependsOn(tasks.testClasses)
+test.dependsOn(tasks.cucumber)
 
 repositories {
     jcenter()
@@ -85,6 +85,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.assertj:assertj-core:3.6.1'
     testCompile 'org.apache.maven:maven-model:2.2.1'
+    testCompile 'org.apache.commons:commons-lang3:3.5'
 
     cucumberRuntime sourceSets.test.output
 }

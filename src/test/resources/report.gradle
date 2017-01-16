@@ -4,20 +4,29 @@ task doReport {
     doLast {
         def result = rootProject.allprojects.collectEntries {
             [
-                    project.path,
-                    configurations.collectEntries { configuration ->
-                        [
-                                configuration.name,
-                                configuration.dependencies.collect {
-                                    [group: it.group, name: it.name, version: it.version]
-                                }
-                        ]
-                    }
+                    it.path,
+                    it.configurations
+                            .collect { configuration ->
+                                [
+                                        configuration.name,
+                                        configuration.dependencies.collect {
+                                            [
+                                                    coordinates: it instanceof ProjectDependency ? "project('${it.dependencyProject.path}')" : "${it.group}:${it.name}:${it.version}",
+                                                    excludes   : it instanceof ModuleDependency ? it.excludeRules.collect {
+                                                        [
+                                                                group : it.group,
+                                                                module: it.module
+                                                        ]
+                                                    } : []
+                                            ]
+                                        }
+                                ]
+                            }
+                            .findAll { it[1]?.size() > 0 }
+                            .collectEntries { it }
             ]
         }
 
-        rootProject.file("report.json").write(JsonOutput.toJson(result))
+        rootProject.file("report.json").write(JsonOutput.prettyPrint(JsonOutput.toJson(result)))
     }
 }
-
-tasks.doReport.execute()
