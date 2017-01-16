@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -49,8 +50,8 @@ public enum EffectiveModelBuilder implements Function<Project, Map<MavenCoordina
       throw new GradleException("Can't build an effective model from POM", e);
     }
 
-    return new SAXBuilder().build(Files.newInputStream(tempFile)).getRootElement().getChildren()
-        .stream()
+    return Stream.of(new SAXBuilder().build(Files.newInputStream(tempFile)).getRootElement())
+        .flatMap(it -> "project".equals(it.getName()) ? Stream.of(it) : it.getChildren().stream())
         .collect(toMap(
             MavenCoordinates::create,
             projectElement -> {

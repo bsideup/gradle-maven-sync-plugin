@@ -2,6 +2,7 @@ plugins {
     id "java-gradle-plugin"
     id "com.gradle.plugin-publish" version "0.9.7"
     id 'com.github.johnrengelman.shadow' version '1.2.3'
+    id "com.github.samueltbrown.cucumber" version "0.9"
 }
 
 group = "com.github.bsideup"
@@ -54,6 +55,19 @@ shadowJar {
 jar.deleteAllActions()
 jar.dependsOn shadowJar
 
+cucumber {
+    println(testReportDirName)
+    formats = [
+            'pretty',
+            "json:${project.buildDir}/test-results/cucumber.json".toString(),
+            "junit:${test.reports.junitXml.destination}/cucumber.xml".toString()
+    ]
+    glueDirs = ['classpath:steps']
+    strict = true
+}
+tasks.cucumber.dependsOn(tasks.test)
+check.dependsOn(tasks.cucumber)
+
 repositories {
     jcenter()
 }
@@ -63,4 +77,14 @@ dependencies {
 
     plugin 'org.zeroturnaround:zt-exec:1.9'
     plugin 'org.jdom:jdom2:2.0.6'
+
+    testCompileOnly 'org.projectlombok:lombok:1.16.12'
+
+    testCompile gradleTestKit()
+    testCompile 'info.cukes:cucumber-java:1.2.4'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.assertj:assertj-core:3.6.1'
+    testCompile 'org.apache.maven:maven-model:2.2.1'
+
+    cucumberRuntime sourceSets.test.output
 }

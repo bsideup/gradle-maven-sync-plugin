@@ -45,7 +45,10 @@ public class MavenCoordinates {
             .ofNullable(rootElement.getChildText(key, namespace))
             .filter(Objects::nonNull)
             .filter(it -> it.trim().length() > 0)
-            .orElseGet(() -> rootElement.getChild("parent", namespace).getChildText(key, namespace));
+            .orElseGet(() -> {
+              Element parent = rootElement.getChild("parent", namespace);
+              return parent != null ? parent.getChildText(key, namespace) : null;
+            });
 
     return new MavenCoordinates(
         getValue.apply("groupId"),
