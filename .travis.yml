@@ -10,6 +10,7 @@ before_install:
   - test $TRAVIS_PULL_REQUEST = false && openssl aes-256-cbc -K $encrypted_9ade1221bc88_key -iv $encrypted_9ade1221bc88_iv -in gradle.properties.enc -out gradle.properties -d
 deploy:
   provider: script
+  skip_cleanup: true
   script: ./gradlew -Pversion=$TRAVIS_TAG clean publishPlugins
   on:
     tags: true
